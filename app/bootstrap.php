@@ -110,7 +110,8 @@ function init_db(PDO $pdo): void {
 
   $count = (int) $pdo->query('SELECT COUNT(*) FROM events')->fetchColumn();
   $seeded = meta_get($pdo, 'demo_seeded') === '1';
-  if (!$seeded && $count === 0) {
+  $seedDemo = (getenv('EVENT_SEED_DEMO') ?: '') === '1';
+  if ($seedDemo && !$seeded && $count === 0) {
     seed_demo_events($pdo);
     meta_set($pdo, 'demo_seeded', '1');
   } elseif (!$seeded) {
