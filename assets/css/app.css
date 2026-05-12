@@ -1308,6 +1308,8 @@ main {
   color: var(--blue);
   font-weight: 800;
   font-size: 20px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .footer-brand img {
@@ -1320,6 +1322,8 @@ main {
   gap: 7px;
   justify-items: center;
   line-height: 1.2;
+  letter-spacing: .04em;
+  text-transform: none;
 }
 
 .footer-copy sup {
