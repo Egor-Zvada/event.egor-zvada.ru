@@ -91,20 +91,11 @@ $pageDescription = 'Билеты на мероприятия и соревнов
             <span class="status-dot"></span>
             <strong>Билет найден в базе</strong>
             <p>Статус: <?= h($ticketStatusLabels[$ticket['status']] ?? $ticket['status']) ?>. Покажите этот экран или QR-код на входе.</p>
-            <?php if (in_array($viewerRole, ['owner', 'controller'], true)): ?>
-              <form method="post" action="/admin/">
-                <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
-                <input type="hidden" name="action" value="ticket_status">
-                <input type="hidden" name="id" value="<?= h($ticket['id']) ?>">
-                <input type="hidden" name="status" value="checked_in">
-                <button class="button button--wide" type="submit">Подтвердить вход</button>
-              </form>
-            <?php endif; ?>
           </aside>
         </div>
       <?php else: ?>
         <section class="empty-state">
-          <p class="kicker">ticket lookup</p>
+          <p class="kicker">проверка билета</p>
           <h1>Билет не найден</h1>
           <a class="button" href="/">К мероприятиям</a>
         </section>

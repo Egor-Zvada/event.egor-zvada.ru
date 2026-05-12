@@ -129,15 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       check_csrf();
 
       if ($action === 'ticket_status') {
-        if (!can_check_tickets()) {
-          http_response_code(403);
-          exit('Forbidden');
-        }
-        $id = (int) ($_POST['id'] ?? 0);
-        $status = in_array($_POST['status'] ?? '', ['confirmed', 'checked_in', 'cancelled'], true) ? (string) $_POST['status'] : 'confirmed';
-        $checked = $status === 'checked_in' ? date('Y-m-d H:i:s') : null;
-        $pdo->prepare('UPDATE tickets SET status = ?, checked_in_at = ? WHERE id = ?')->execute([$status, $checked, $id]);
-        go_admin('Билет обновлен.', 'tickets');
+        http_response_code(403);
+        exit('Forbidden');
       }
 
       if ($action === 'save_event') {
