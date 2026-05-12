@@ -133,14 +133,14 @@ $pageDescription = 'Билеты на мероприятия и соревнов
           <?php if (!empty($event['image'])): ?>
             <img class="event-cover" src="<?= h($event['image']) ?>" alt="">
           <?php endif; ?>
-          <p class="kicker"><?= ((int) $event['is_paid'] === 1) ? 'платный вход' : 'свободный вход' ?></p>
+          <p class="kicker">Оформление билета</p>
           <h1><?= h($event['title']) ?></h1>
           <p class="lead"><?= h($event['description']) ?></p>
           <dl class="facts">
             <div><dt>Дата</dt><dd><?= h(format_date_ru($event['starts_at'])) ?><?= count($days) > 1 ? ' / ' . count($days) . ' дня' : '' ?></dd></div>
             <div><dt>Время</dt><dd><?= h($event['starts_time']) ?></dd></div>
             <div><dt>Место</dt><dd><?= h($event['venue']) ?></dd></div>
-            <div><dt>Билеты</dt><dd><?= ((int) $event['is_paid'] === 1) ? h(money((int) $event['price'])) . ' за день' : 'бесплатно' ?></dd></div>
+            <div><dt>Билеты</dt><dd>бесплатно</dd></div>
           </dl>
           <?php $gallery = gallery_items($event['gallery'] ?? '[]'); ?>
           <?php if ($gallery): ?>
@@ -191,14 +191,14 @@ $pageDescription = 'Билеты на мероприятия и соревнов
             <label>Email <input name="email" type="email" required autocomplete="email"></label>
             <label>Телефон <input name="phone" autocomplete="tel"></label>
           </div>
-          <button class="button button--wide" type="submit"><?= ((int) $event['is_paid'] === 1) ? 'Купить билет' : 'Получить билет' ?></button>
+          <button class="button button--wide" type="submit">Получить билет</button>
         </form>
       </div>
     </section>
   <?php else: ?>
     <section class="hero">
       <div class="hero__copy">
-        <p class="kicker">мероприятия / билеты</p>
+        <p class="kicker">Билеты на мероприятия</p>
         <h1>Мероприятия</h1>
         <p>Выберите мероприятие, забронируйте место и получите QR-билет сразу на экране.</p>
       </div>
@@ -210,7 +210,6 @@ $pageDescription = 'Билеты на мероприятия и соревнов
 
     <section class="events-toolbar" aria-label="Поиск мероприятий">
       <div>
-        <p class="kicker">список</p>
         <h2>Доступные мероприятия</h2>
       </div>
       <label class="search-field">
@@ -222,7 +221,6 @@ $pageDescription = 'Билеты на мероприятия и соревнов
     <section class="event-list" aria-label="Список мероприятий">
       <?php if (!$events): ?>
         <article class="empty-list">
-          <p class="kicker">empty</p>
           <h2>Мероприятий пока нет</h2>
           <p>Когда администратор опубликует событие, оно появится здесь.</p>
         </article>
@@ -230,12 +228,10 @@ $pageDescription = 'Билеты на мероприятия и соревнов
       <?php foreach ($events as $index => $item): ?>
         <?php $days = event_days($pdo, (int) $item['id']); ?>
         <article class="event-card" data-event-card data-event-title="<?= h(mb_strtolower(($item['title'] ?? '') . ' ' . ($item['venue'] ?? ''), 'UTF-8')) ?>">
-          <?php if (!empty($item['image'])): ?>
-            <img class="event-card__image" src="<?= h($item['image']) ?>" alt="">
-          <?php endif; ?>
-          <div class="event-card__index"><?= h(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) ?></div>
+          <div class="event-card__media">
+            <img src="<?= h(!empty($item['image']) ? $item['image'] : '/assets/img/school-logo.png') ?>" alt="">
+          </div>
           <div class="event-card__body">
-            <p class="kicker"><?= ((int) $item['is_paid'] === 1) ? 'платный вход' : 'свободный вход' ?></p>
             <h2><?= h($item['title']) ?></h2>
             <p><?= h($item['description']) ?></p>
             <div class="event-card__meta">
@@ -246,8 +242,8 @@ $pageDescription = 'Билеты на мероприятия и соревнов
             </div>
           </div>
           <div class="event-card__action">
-            <strong><?= ((int) $item['is_paid'] === 1) ? h(money((int) $item['price'])) : 'бесплатно' ?></strong>
-            <a class="button" href="/?event=<?= urlencode((string) $item['slug']) ?>"><?= ((int) $item['is_paid'] === 1) ? 'Купить' : 'Получить' ?></a>
+            <strong>бесплатно</strong>
+            <a class="button" href="/?event=<?= urlencode((string) $item['slug']) ?>">Получить билет</a>
           </div>
         </article>
       <?php endforeach; ?>

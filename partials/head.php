@@ -8,7 +8,7 @@
   <meta property="og:title" content="<?= h($pageTitle ?? APP_NAME) ?>">
   <meta property="og:description" content="<?= h($pageDescription ?? '') ?>">
   <title><?= h($pageTitle ?? APP_NAME) ?></title>
-  <link rel="icon" href="/assets/svg/school-logo.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/img/school-logo.png" type="image/png">
   <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>

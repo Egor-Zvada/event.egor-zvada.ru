@@ -27,8 +27,8 @@ if (!in_array($tab, $allowedTabs, true)) {
 
 function role_label(string $role): string {
   return [
-    'owner' => 'Главный админ',
-    'admin' => 'Админ мероприятий',
+    'owner' => 'Администратор',
+    'admin' => 'Методист',
     'controller' => 'Контролер',
   ][$role] ?? $role;
 }
@@ -144,7 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_events_role();
         $id = (int) ($_POST['id'] ?? 0);
         $title = trim((string) ($_POST['title'] ?? ''));
-        $slug = trim((string) ($_POST['slug'] ?? '')) ?: slugify($title);
         $description = trim((string) ($_POST['description'] ?? ''));
         $startsAt = trim((string) ($_POST['starts_at'] ?? ''));
         $startsTime = trim((string) ($_POST['starts_time'] ?? ''));
@@ -152,15 +151,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $organizer = trim((string) ($_POST['organizer'] ?? ''));
         $capacity = max(1, min(5000, (int) ($_POST['capacity'] ?? 100)));
         $days = max(1, min(30, (int) ($_POST['days_count'] ?? 1)));
-        $isPaid = !empty($_POST['is_paid']) ? 1 : 0;
-        $price = max(0, (int) round(((float) str_replace(',', '.', (string) ($_POST['price'] ?? '0'))) * 100));
+        $isPaid = 0;
+        $price = 0;
         $status = in_array($_POST['status'] ?? 'published', ['draft', 'published', 'archived'], true) ? (string) $_POST['status'] : 'published';
         $oldEvent = null;
         if ($id > 0) {
-          $oldStmt = $pdo->prepare('SELECT image, gallery FROM events WHERE id = ?');
+          $oldStmt = $pdo->prepare('SELECT slug, image, gallery FROM events WHERE id = ?');
           $oldStmt->execute([$id]);
           $oldEvent = $oldStmt->fetch() ?: null;
         }
+        $slug = $oldEvent['slug'] ?? slugify($title);
         $image = upload_image('image_upload', (string) ($oldEvent['image'] ?? ''));
         $gallery = gallery_items($oldEvent['gallery'] ?? '[]');
         $gallery = upload_gallery('gallery_uploads', $gallery);
@@ -286,13 +286,13 @@ $mail = mail_config($pdo);
   <meta name="robots" content="noindex,nofollow">
   <meta name="color-scheme" content="light">
   <title>Админка - события</title>
-  <link rel="icon" href="/assets/svg/school-logo.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/img/school-logo.png" type="image/png">
   <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>
 <header class="site-header admin-header">
   <a class="brand" href="/" aria-label="На сайт">
-    <img class="brand__mark brand__mark--school" src="/assets/svg/school-logo.svg" alt="">
+    <img class="brand__mark brand__mark--school" src="/assets/img/school-logo.png" alt="">
     <span class="brand__copy">
       <span class="brand__text">СШ ВВЕ</span>
       <span class="brand__module">Админка</span>
@@ -314,7 +314,7 @@ $mail = mail_config($pdo);
 <main class="admin-layout">
   <?php if (!is_staff()): ?>
     <section class="empty-state admin-login">
-      <p class="kicker">secure session</p>
+      <p class="kicker">Защищенный вход</p>
       <h1>Админка</h1>
       <?php if ($error !== ''): ?><div class="notice notice--error"><?= h($error) ?></div><?php endif; ?>
       <form class="booking-panel" method="post">
@@ -329,7 +329,6 @@ $mail = mail_config($pdo);
   <?php else: ?>
     <div class="admin-shell">
       <aside class="admin-sidebar">
-        <p class="kicker">control room</p>
         <h1>Панель</h1>
         <nav class="admin-menu" aria-label="Разделы админки">
           <?php if (can_manage_events()): ?><a class="<?= $tab === 'events' ? 'is-active' : '' ?>" href="/admin/?tab=events">Мероприятия</a><?php endif; ?>
@@ -346,7 +345,6 @@ $mail = mail_config($pdo);
         <?php if ($tab === 'events' && can_manage_events()): ?>
           <div class="admin-section-head">
             <div>
-              <p class="kicker">events</p>
               <h2>Мероприятия</h2>
             </div>
             <a class="button" href="/admin/?tab=events#event-form">Создать мероприятие</a>
@@ -385,7 +383,6 @@ $mail = mail_config($pdo);
                 <input type="hidden" name="id" value="<?= h($editEvent['id'] ?? 0) ?>">
                 <div class="form-grid">
                   <label>Название <input name="title" value="<?= h($editEvent['title'] ?? '') ?>" required></label>
-                  <label>Slug <input name="slug" value="<?= h($editEvent['slug'] ?? '') ?>" placeholder="создастся автоматически"></label>
                   <label>Описание <textarea name="description"><?= h($editEvent['description'] ?? '') ?></textarea></label>
                   <?php if (!empty($editEvent['image'])): ?>
                     <div class="image-preview"><img src="<?= h($editEvent['image']) ?>" alt=""><label class="check"><input name="delete_image" type="checkbox" value="1"> Убрать обложку</label></div>
@@ -413,10 +410,6 @@ $mail = mail_config($pdo);
                   </div>
                   <label>Место проведения <input name="venue" value="<?= h($editEvent['venue'] ?? '') ?>" required></label>
                   <label>Организатор <input name="organizer" value="<?= h($editEvent['organizer'] ?? 'СШ ВВЕ') ?>" required></label>
-                  <div class="form-pair">
-                    <label class="check"><input name="is_paid" type="checkbox" value="1" <?= !empty($editEvent['is_paid']) ? 'checked' : '' ?>> Платное</label>
-                    <label>Цена за день, ₽ <input name="price" type="number" min="0" step="1" value="<?= h($editEvent ? ((int) $editEvent['price'] / 100) : 0) ?>"></label>
-                  </div>
                   <label>Статус
                     <select name="status">
                       <?php foreach (['draft' => 'Черновик', 'published' => 'Опубликовано', 'archived' => 'Архив'] as $value => $label): ?>
@@ -434,7 +427,6 @@ $mail = mail_config($pdo);
         <?php if ($tab === 'tickets'): ?>
           <div class="admin-section-head">
             <div>
-              <p class="kicker">access control</p>
               <h2>Проверка билетов</h2>
             </div>
           </div>
@@ -476,7 +468,6 @@ $mail = mail_config($pdo);
         <?php if ($tab === 'staff' && can_manage_staff()): ?>
           <div class="admin-section-head">
             <div>
-              <p class="kicker">team</p>
               <h2>Сотрудники</h2>
             </div>
           </div>
@@ -521,7 +512,6 @@ $mail = mail_config($pdo);
         <?php if ($tab === 'settings'): ?>
           <div class="admin-section-head">
             <div>
-              <p class="kicker">settings</p>
               <h2>Настройки</h2>
             </div>
           </div>

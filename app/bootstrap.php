@@ -381,7 +381,7 @@ function create_ticket(PDO $pdo, array $event, array $dayIds, int $seat, string 
   $pdo->beginTransaction();
   try {
     $code = ticket_code();
-    $paidAmount = ((int) $event['is_paid'] === 1) ? (int) $event['price'] * count($dayIds) : 0;
+    $paidAmount = 0;
     $stmt = $pdo->prepare('INSERT INTO tickets (code,event_id,seat_number,buyer_name,buyer_email,buyer_phone,paid_amount) VALUES (?,?,?,?,?,?,?)');
     $stmt->execute([$code, (int) $event['id'], $seat, $name, $email, $phone, $paidAmount]);
     $ticketId = (int) $pdo->lastInsertId();
