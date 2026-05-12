@@ -213,7 +213,7 @@ $pageDescription = 'Билеты на мероприятия и соревнов
         <h2>Доступные мероприятия</h2>
       </div>
       <label class="search-field">
-        <span>Поиск</span>
+        <span class="search-field__icon" aria-hidden="true">⌕</span>
         <input type="search" placeholder="Название или место" data-event-search>
       </label>
     </section>

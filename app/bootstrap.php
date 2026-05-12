@@ -119,6 +119,7 @@ function init_db(PDO $pdo): void {
     meta_set($pdo, 'demo_seeded', '1');
   }
   seed_staff_users($pdo);
+  cleanup_expired_ticket_personal_data($pdo);
 }
 
 function ensure_column(PDO $pdo, string $table, string $column, string $definition): void {
@@ -417,6 +418,24 @@ function ticket_by_code(PDO $pdo, string $code): ?array {
   $days->execute([(int) $ticket['id']]);
   $ticket['days'] = $days->fetchAll();
   return $ticket;
+}
+
+function cleanup_expired_ticket_personal_data(PDO $pdo): void {
+  $pdo->exec("
+    UPDATE tickets
+    SET buyer_name = 'Данные удалены',
+        buyer_email = '',
+        buyer_phone = ''
+    WHERE id IN (
+      SELECT t.id
+      FROM tickets t
+      JOIN ticket_days td ON td.ticket_id = t.id
+      JOIN event_days d ON d.id = td.event_day_id
+      GROUP BY t.id
+      HAVING date(MAX(d.event_date), '+3 days') < date('now')
+    )
+    AND (buyer_email != '' OR buyer_phone != '' OR buyer_name != 'Данные удалены')
+  ");
 }
 
 function mail_config(?PDO $pdo = null): array {

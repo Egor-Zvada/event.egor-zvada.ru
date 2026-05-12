@@ -285,7 +285,7 @@ $mail = mail_config($pdo);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
   <meta name="color-scheme" content="light">
-  <title>Админка - события</title>
+  <title>Панель управления - события</title>
   <link rel="icon" href="/assets/img/school-logo.png" type="image/png">
   <link rel="stylesheet" href="/assets/css/app.css">
 </head>
@@ -295,7 +295,7 @@ $mail = mail_config($pdo);
     <img class="brand__mark brand__mark--school" src="/assets/img/school-logo.png" alt="">
     <span class="brand__copy">
       <span class="brand__text">СШ ВВЕ</span>
-      <span class="brand__module">Админка</span>
+      <span class="brand__module">Панель управления</span>
     </span>
   </a>
   <nav class="site-nav">
@@ -315,7 +315,7 @@ $mail = mail_config($pdo);
   <?php if (!is_staff()): ?>
     <section class="empty-state admin-login">
       <p class="kicker">Защищенный вход</p>
-      <h1>Админка</h1>
+      <h1>Панель управления</h1>
       <?php if ($error !== ''): ?><div class="notice notice--error"><?= h($error) ?></div><?php endif; ?>
       <form class="booking-panel" method="post">
         <input type="hidden" name="action" value="login">
@@ -329,7 +329,7 @@ $mail = mail_config($pdo);
   <?php else: ?>
     <div class="admin-shell">
       <aside class="admin-sidebar">
-        <h1>Панель</h1>
+        <h1>Разделы</h1>
         <nav class="admin-menu" aria-label="Разделы админки">
           <?php if (can_manage_events()): ?><a class="<?= $tab === 'events' ? 'is-active' : '' ?>" href="/admin/?tab=events">Мероприятия</a><?php endif; ?>
           <?php if (can_check_tickets()): ?><a class="<?= $tab === 'tickets' ? 'is-active' : '' ?>" href="/admin/?tab=tickets">Проверка билетов</a><?php endif; ?>
@@ -430,6 +430,20 @@ $mail = mail_config($pdo);
               <h2>Проверка билетов</h2>
             </div>
           </div>
+          <section class="admin-panel qr-panel" data-qr-scanner>
+            <div class="qr-panel__head">
+              <div>
+                <h3>Сканер QR-кодов</h3>
+                <p>Наведите камеру на QR-код билета. Если браузер не даст доступ к камере, используйте поле ниже.</p>
+              </div>
+              <button class="button" type="button" data-qr-start>Включить камеру</button>
+            </div>
+            <video class="qr-video" data-qr-video playsinline muted hidden></video>
+            <div class="qr-result" data-qr-result data-state="idle">
+              <strong>Ожидание сканирования</strong>
+              <span>Проверка покажет мероприятие, место и статус прохода.</span>
+            </div>
+          </section>
           <section class="admin-panel">
             <form class="ticket-check-form" method="get" action="/">
               <label>Код билета <input name="ticket" placeholder="ABC123" autocomplete="off"></label>
@@ -496,7 +510,7 @@ $mail = mail_config($pdo);
                   <label>Пароль <input name="password" type="password" <?= $editUser ? '' : 'required' ?>></label>
                   <label>Роль
                     <select name="role">
-                      <?php foreach (['controller', 'admin', 'owner'] as $role): ?>
+                      <?php foreach (['owner', 'admin', 'controller'] as $role): ?>
                         <option value="<?= h($role) ?>" <?= (($editUser['role'] ?? '') === $role) ? 'selected' : '' ?>><?= h(role_label($role)) ?></option>
                       <?php endforeach; ?>
                     </select>
