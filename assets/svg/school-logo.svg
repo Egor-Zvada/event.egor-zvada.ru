@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="ОГАУ ДО СШ ВВЕ">
+  <defs>
+    <clipPath id="inner">
+      <circle cx="120" cy="120" r="78"/>
+    </clipPath>
+  </defs>
+  <circle cx="120" cy="120" r="116" fill="#fff"/>
+  <circle cx="120" cy="120" r="109" fill="none" stroke="#1296d4" stroke-width="10"/>
+  <circle cx="120" cy="120" r="82" fill="none" stroke="#1f4fa3" stroke-width="9"/>
+  <g clip-path="url(#inner)">
+    <rect x="38" y="38" width="164" height="164" fill="#1f4fa3"/>
+    <path d="M41 120a79 79 0 0 1 158 0v80H41Z" fill="#f43831"/>
+    <path d="M55 152c26-48 92-54 130-10 14 17 22 35 23 57H55Z" fill="#1f4fa3"/>
+  </g>
+  <path d="M85 70c10 6 24 6 34 14 16 13 30 19 49 21 11 1 18 9 22 18-10 1-15 8-15 17 0 15-9 28-22 33l-31 12c-4 2-7 5-7 9v20c0 8 6 13 14 13h21c5 0 9 4 9 9H95c-1-7 4-17 8-28 5-15 2-31-6-45-11-19-17-37-16-59 0-13 1-25 4-34Z" fill="#fff" stroke="#1f4fa3" stroke-width="6" stroke-linejoin="round"/>
+  <text x="120" y="38" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" fill="#1f4fa3">ОГАУ ДО СШ ВВЕ</text>
+  <text x="120" y="218" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="17" font-weight="700" fill="#1f4fa3">САХАЛИНСКАЯ ОБЛАСТЬ</text>
+</svg>

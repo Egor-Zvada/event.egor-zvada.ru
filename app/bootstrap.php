@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const APP_NAME = 'Egor Zvada Events';
+const APP_NAME = 'СШ ВВЕ — билеты';
 const APP_VERSION = '0.1-alpha';
 
 $root = dirname(__DIR__);
@@ -192,7 +192,7 @@ function seed_demo_events(PDO $pdo): void {
       '2026-06-18',
       '18:30',
       'Севастополь, арт-кластер',
-      'egor_zvada',
+      'СШ ВВЕ',
       96,
       1,
       250000,
@@ -428,7 +428,7 @@ function mail_config(?PDO $pdo = null): array {
       'password' => meta_get($pdo, 'smtp_password') ?? '',
       'encryption' => meta_get($pdo, 'smtp_encryption') ?? 'tls',
       'from_email' => meta_get($pdo, 'smtp_from_email') ?? '',
-      'from_name' => meta_get($pdo, 'smtp_from_name') ?? 'Egor Zvada Events',
+      'from_name' => meta_get($pdo, 'smtp_from_name') ?? APP_NAME,
     ];
     if (trim($dbConfig['host']) !== '') {
       return $dbConfig;
@@ -449,7 +449,7 @@ function mail_config(?PDO $pdo = null): array {
     'password' => getenv('SMTP_PASS') ?: '',
     'encryption' => getenv('SMTP_ENCRYPTION') ?: 'tls',
     'from_email' => getenv('SMTP_FROM') ?: 'tickets@event.egor-zvada.ru',
-    'from_name' => getenv('SMTP_FROM_NAME') ?: 'Egor Zvada Events',
+    'from_name' => getenv('SMTP_FROM_NAME') ?: APP_NAME,
   ];
 }
 

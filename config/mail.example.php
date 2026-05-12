@@ -7,5 +7,5 @@ return [
   'password' => 'change-me',
   'encryption' => 'tls',
   'from_email' => 'tickets@example.ru',
-  'from_name' => 'Egor Zvada Events',
+  'from_name' => 'СШ ВВЕ — билеты',
 ];

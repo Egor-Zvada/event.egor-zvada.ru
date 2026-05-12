@@ -129,6 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       check_csrf();
 
       if ($action === 'ticket_status') {
+        if (!can_check_tickets()) {
+          http_response_code(403);
+          exit('Forbidden');
+        }
         $id = (int) ($_POST['id'] ?? 0);
         $status = in_array($_POST['status'] ?? '', ['confirmed', 'checked_in', 'cancelled'], true) ? (string) $_POST['status'] : 'confirmed';
         $checked = $status === 'checked_in' ? date('Y-m-d H:i:s') : null;
@@ -280,23 +284,24 @@ $mail = mail_config($pdo);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="color-scheme" content="dark light">
+  <meta name="color-scheme" content="light">
   <title>Админка - события</title>
-  <link rel="icon" href="/assets/svg/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/svg/school-logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>
 <header class="site-header admin-header">
   <a class="brand" href="/" aria-label="На сайт">
-    <img class="brand__mark" src="/assets/svg/logo.svg" alt="">
-    <span class="brand__text">egor_zvada</span>
-    <span class="brand__module">admin</span>
+    <img class="brand__mark brand__mark--school" src="/assets/svg/school-logo.svg" alt="">
+    <span class="brand__copy">
+      <span class="brand__text">СШ ВВЕ</span>
+      <span class="brand__module">Админка</span>
+    </span>
   </a>
   <nav class="site-nav">
     <a href="/">Сайт</a>
     <?php if (is_staff()): ?>
-      <span><?= h($_SESSION['admin_username'] ?? '') ?> / <?= h(role_label((string) ($_SESSION['admin_role'] ?? ''))) ?></span>
-      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему"><span class="theme-toggle__dot"></span><span class="theme-toggle__text">theme</span></button>
+      <span class="admin-header__meta"><?= h($_SESSION['admin_username'] ?? '') ?> / <?= h(role_label((string) ($_SESSION['admin_role'] ?? ''))) ?></span>
       <form method="post">
         <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
         <input type="hidden" name="action" value="logout">
@@ -407,7 +412,7 @@ $mail = mail_config($pdo);
                     <label>Количество мест <input name="capacity" type="number" min="1" max="5000" value="<?= h($editEvent['capacity'] ?? 100) ?>" required></label>
                   </div>
                   <label>Место проведения <input name="venue" value="<?= h($editEvent['venue'] ?? '') ?>" required></label>
-                  <label>Организатор <input name="organizer" value="<?= h($editEvent['organizer'] ?? 'egor_zvada') ?>" required></label>
+                  <label>Организатор <input name="organizer" value="<?= h($editEvent['organizer'] ?? 'СШ ВВЕ') ?>" required></label>
                   <div class="form-pair">
                     <label class="check"><input name="is_paid" type="checkbox" value="1" <?= !empty($editEvent['is_paid']) ? 'checked' : '' ?>> Платное</label>
                     <label>Цена за день, ₽ <input name="price" type="number" min="0" step="1" value="<?= h($editEvent ? ((int) $editEvent['price'] / 100) : 0) ?>"></label>
@@ -552,7 +557,7 @@ $mail = mail_config($pdo);
                     <label>Логин <input name="smtp_username" value="<?= h($mail['username'] ?? '') ?>"></label>
                     <label>Новый пароль SMTP <input name="smtp_password" type="password" placeholder="<?= !empty($mail['password']) ? 'пароль сохранен' : '' ?>"></label>
                     <label>От кого, email <input name="smtp_from_email" value="<?= h($mail['from_email'] ?? '') ?>" placeholder="tickets@example.ru"></label>
-                    <label>От кого, имя <input name="smtp_from_name" value="<?= h($mail['from_name'] ?? 'Egor Zvada Events') ?>"></label>
+                    <label>От кого, имя <input name="smtp_from_name" value="<?= h($mail['from_name'] ?? APP_NAME) ?>"></label>
                   </div>
                   <button class="button button--wide" type="submit">Сохранить почту</button>
                 </form>

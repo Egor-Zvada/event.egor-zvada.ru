@@ -52,8 +52,8 @@ $slug = isset($_GET['event']) ? trim((string) $_GET['event']) : '';
 $event = $slug !== '' ? event_by_slug($pdo, $slug) : null;
 $events = published_events($pdo);
 
-$pageTitle = $ticket ? 'Билет ' . $ticket['code'] : ($event ? $event['title'] : 'Мероприятия — egor_zvada');
-$pageDescription = 'Билеты на мероприятия, соревнования и технические шоукейсы egor_zvada.';
+$pageTitle = $ticket ? 'Билет ' . $ticket['code'] : ($event ? $event['title'] : 'Мероприятия');
+$pageDescription = 'Билеты на мероприятия и соревнования.';
 ?>
 <?php include __DIR__ . '/partials/head.php'; ?>
 <?php include __DIR__ . '/partials/header.php'; ?>

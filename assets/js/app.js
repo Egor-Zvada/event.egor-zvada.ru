@@ -37,42 +37,8 @@
 
 (() => {
   const root = document.documentElement;
-  const toggle = document.querySelector('[data-theme-toggle]');
-  const storageKey = 'egor-events-theme';
-  const modeStorageKey = 'egor-events-theme-mode';
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-
-  const getStored = (key) => {
-    try { return localStorage.getItem(key); } catch { return null; }
-  };
-  const setStored = (key, value) => {
-    try { localStorage.setItem(key, value); } catch {}
-  };
-  const removeStored = (key) => {
-    try { localStorage.removeItem(key); } catch {}
-  };
-  const systemTheme = () => mediaQuery.matches ? 'light' : 'dark';
-  const initialTheme = () => {
-    const saved = getStored(storageKey);
-    return getStored(modeStorageKey) === 'manual' && (saved === 'light' || saved === 'dark') ? saved : systemTheme();
-  };
-  const applyTheme = (theme, persist = false) => {
-    root.dataset.theme = theme;
-    root.style.colorScheme = theme;
-    if (persist) {
-      setStored(storageKey, theme);
-      setStored(modeStorageKey, 'manual');
-    }
-    const text = toggle?.querySelector('.theme-toggle__text');
-    if (text) text.textContent = theme === 'light' ? 'dark' : 'light';
-  };
-
-  applyTheme(initialTheme());
-  toggle?.addEventListener('click', () => applyTheme(root.dataset.theme === 'light' ? 'dark' : 'light', true));
-  mediaQuery.addEventListener?.('change', () => {
-    removeStored(modeStorageKey);
-    applyTheme(systemTheme());
-  });
+  root.dataset.theme = 'light';
+  root.style.colorScheme = 'light';
 })();
 
 (() => {
