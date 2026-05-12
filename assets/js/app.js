@@ -71,6 +71,13 @@
 })();
 
 (() => {
+  const button = document.querySelector('[data-scroll-top]');
+  button?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+(() => {
   const scanner = document.querySelector('[data-qr-scanner]');
   if (!scanner) return;
 

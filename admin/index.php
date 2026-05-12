@@ -573,6 +573,4 @@ $mail = mail_config($pdo);
     </div>
   <?php endif; ?>
 </main>
-<script src="/assets/js/app.js"></script>
-</body>
-</html>
+<?php include dirname(__DIR__) . '/partials/footer.php'; ?>
