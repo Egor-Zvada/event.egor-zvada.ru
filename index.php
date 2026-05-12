@@ -78,7 +78,6 @@ $pageDescription = 'Билеты на мероприятия и соревнов
               <span class="ticket-code"><?= h($ticket['code']) ?></span>
               <h2><?= h($ticket['buyer_name']) ?></h2>
               <p><?= h($ticket['venue']) ?></p>
-              <p><?= h($ticket['organizer']) ?></p>
             </div>
             <img class="ticket-qr" src="/qr.php?text=<?= urlencode($verifyUrl) ?>" alt="QR-код билета">
           </article>
@@ -134,14 +133,13 @@ $pageDescription = 'Билеты на мероприятия и соревнов
           <?php if (!empty($event['image'])): ?>
             <img class="event-cover" src="<?= h($event['image']) ?>" alt="">
           <?php endif; ?>
-          <p class="kicker"><?= ((int) $event['is_paid'] === 1) ? 'paid access' : 'free access' ?></p>
+          <p class="kicker"><?= ((int) $event['is_paid'] === 1) ? 'платный вход' : 'свободный вход' ?></p>
           <h1><?= h($event['title']) ?></h1>
           <p class="lead"><?= h($event['description']) ?></p>
           <dl class="facts">
             <div><dt>Дата</dt><dd><?= h(format_date_ru($event['starts_at'])) ?><?= count($days) > 1 ? ' / ' . count($days) . ' дня' : '' ?></dd></div>
             <div><dt>Время</dt><dd><?= h($event['starts_time']) ?></dd></div>
             <div><dt>Место</dt><dd><?= h($event['venue']) ?></dd></div>
-            <div><dt>Организатор</dt><dd><?= h($event['organizer']) ?></dd></div>
             <div><dt>Билеты</dt><dd><?= ((int) $event['is_paid'] === 1) ? h(money((int) $event['price'])) . ' за день' : 'бесплатно' ?></dd></div>
           </dl>
           <?php $gallery = gallery_items($event['gallery'] ?? '[]'); ?>
@@ -200,24 +198,24 @@ $pageDescription = 'Билеты на мероприятия и соревнов
   <?php else: ?>
     <section class="hero">
       <div class="hero__copy">
-        <p class="kicker">event module / tickets</p>
+        <p class="kicker">мероприятия / билеты</p>
         <h1>Мероприятия</h1>
         <p>Выберите мероприятие, забронируйте место и получите QR-билет сразу на экране.</p>
       </div>
       <div class="hero__panel">
         <span><?= count($events) ?></span>
-        <p>активных события</p>
+        <p>активных мероприятий</p>
       </div>
     </section>
 
     <section class="events-toolbar" aria-label="Поиск мероприятий">
       <div>
-        <p class="kicker">event index</p>
+        <p class="kicker">список</p>
         <h2>Доступные мероприятия</h2>
       </div>
       <label class="search-field">
         <span>Поиск</span>
-        <input type="search" placeholder="Название, место, организатор" data-event-search>
+        <input type="search" placeholder="Название или место" data-event-search>
       </label>
     </section>
 
@@ -231,13 +229,13 @@ $pageDescription = 'Билеты на мероприятия и соревнов
       <?php endif; ?>
       <?php foreach ($events as $index => $item): ?>
         <?php $days = event_days($pdo, (int) $item['id']); ?>
-        <article class="event-card" data-event-card data-event-title="<?= h(mb_strtolower(($item['title'] ?? '') . ' ' . ($item['venue'] ?? '') . ' ' . ($item['organizer'] ?? ''), 'UTF-8')) ?>">
+        <article class="event-card" data-event-card data-event-title="<?= h(mb_strtolower(($item['title'] ?? '') . ' ' . ($item['venue'] ?? ''), 'UTF-8')) ?>">
           <?php if (!empty($item['image'])): ?>
             <img class="event-card__image" src="<?= h($item['image']) ?>" alt="">
           <?php endif; ?>
           <div class="event-card__index"><?= h(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) ?></div>
           <div class="event-card__body">
-            <p class="kicker"><?= h($item['organizer']) ?></p>
+            <p class="kicker"><?= ((int) $item['is_paid'] === 1) ? 'платный вход' : 'свободный вход' ?></p>
             <h2><?= h($item['title']) ?></h2>
             <p><?= h($item['description']) ?></p>
             <div class="event-card__meta">
@@ -248,7 +246,7 @@ $pageDescription = 'Билеты на мероприятия и соревнов
             </div>
           </div>
           <div class="event-card__action">
-            <strong><?= ((int) $item['is_paid'] === 1) ? h(money((int) $item['price'])) : 'free' ?></strong>
+            <strong><?= ((int) $item['is_paid'] === 1) ? h(money((int) $item['price'])) : 'бесплатно' ?></strong>
             <a class="button" href="/?event=<?= urlencode((string) $item['slug']) ?>"><?= ((int) $item['is_paid'] === 1) ? 'Купить' : 'Получить' ?></a>
           </div>
         </article>
