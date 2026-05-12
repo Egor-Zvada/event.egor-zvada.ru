@@ -42,11 +42,11 @@ function can_manage_staff(): bool {
 }
 
 function can_check_tickets(): bool {
-  return in_array($_SESSION['admin_role'] ?? '', ['owner', 'admin', 'controller'], true);
+  return in_array($_SESSION['admin_role'] ?? '', ['owner', 'controller'], true);
 }
 
 function is_staff(): bool {
-  return !empty($_SESSION['staff_id']) && can_check_tickets();
+  return !empty($_SESSION['staff_id']) && in_array($_SESSION['admin_role'] ?? '', ['owner', 'admin', 'controller'], true);
 }
 
 function require_staff(): void {
@@ -239,6 +239,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (is_staff() && !can_manage_events() && $tab === 'events') {
   $tab = 'tickets';
 }
+if (is_staff() && !can_check_tickets() && $tab === 'tickets') {
+  $tab = can_manage_events() ? 'events' : 'settings';
+}
 if (is_staff() && !can_manage_staff() && $tab === 'staff') {
   $tab = 'settings';
 }
@@ -325,7 +328,7 @@ $mail = mail_config($pdo);
         <h1>Панель</h1>
         <nav class="admin-menu" aria-label="Разделы админки">
           <?php if (can_manage_events()): ?><a class="<?= $tab === 'events' ? 'is-active' : '' ?>" href="/admin/?tab=events">Мероприятия</a><?php endif; ?>
-          <a class="<?= $tab === 'tickets' ? 'is-active' : '' ?>" href="/admin/?tab=tickets">Проверка билетов</a>
+          <?php if (can_check_tickets()): ?><a class="<?= $tab === 'tickets' ? 'is-active' : '' ?>" href="/admin/?tab=tickets">Проверка билетов</a><?php endif; ?>
           <?php if (can_manage_staff()): ?><a class="<?= $tab === 'staff' ? 'is-active' : '' ?>" href="/admin/?tab=staff">Сотрудники</a><?php endif; ?>
           <a class="<?= $tab === 'settings' ? 'is-active' : '' ?>" href="/admin/?tab=settings">Настройки</a>
         </nav>
