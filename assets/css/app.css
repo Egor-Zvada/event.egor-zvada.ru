@@ -1127,6 +1127,11 @@ main {
   background: linear-gradient(145deg, #fff, #f4f8ff);
 }
 
+.hero__panel span {
+  font-family: var(--font-main);
+  font-variant-numeric: lining-nums;
+}
+
 .events-toolbar {
   margin-top: 18px;
   padding: 28px;
