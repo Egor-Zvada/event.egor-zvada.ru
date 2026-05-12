@@ -51,6 +51,11 @@ $ticket = $ticketCode !== '' ? ticket_by_code($pdo, $ticketCode) : null;
 $slug = isset($_GET['event']) ? trim((string) $_GET['event']) : '';
 $event = $slug !== '' ? event_by_slug($pdo, $slug) : null;
 $events = published_events($pdo);
+$ticketStatusLabels = [
+  'confirmed' => 'Билет активен',
+  'checked_in' => 'Билет погашен',
+  'cancelled' => 'Билет отменен',
+];
 
 $pageTitle = $ticket ? 'Билет ' . $ticket['code'] : ($event ? $event['title'] : 'Мероприятия');
 $pageDescription = 'Билеты на мероприятия и соревнования.';
@@ -64,7 +69,7 @@ $pageDescription = 'Билеты на мероприятия и соревнов
       <?php if ($ticket): ?>
         <?php $verifyUrl = app_url('?ticket=' . urlencode((string) $ticket['code'])); ?>
         <div class="ticket-hero">
-          <p class="kicker">valid ticket / <?= h($ticket['status']) ?></p>
+          <p class="kicker"><?= h($ticketStatusLabels[$ticket['status']] ?? 'Билет найден') ?></p>
           <h1><?= h($ticket['title']) ?></h1>
           <div class="ticket-meta">
             <span><?= h(implode(' + ', array_map(static fn($day) => format_date_ru($day['event_date']), $ticket['days']))) ?></span>
@@ -85,7 +90,7 @@ $pageDescription = 'Билеты на мероприятия и соревнов
           <aside class="status-panel">
             <span class="status-dot"></span>
             <strong>Билет найден в базе</strong>
-            <p>Статус билета: <?= h($ticket['status']) ?>. Покажите этот экран или QR-код на входе.</p>
+            <p>Статус: <?= h($ticketStatusLabels[$ticket['status']] ?? $ticket['status']) ?>. Покажите этот экран или QR-код на входе.</p>
             <?php if (in_array($viewerRole, ['owner', 'controller'], true)): ?>
               <form method="post" action="/admin/">
                 <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
