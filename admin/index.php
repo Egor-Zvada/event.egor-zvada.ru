@@ -450,33 +450,6 @@ $mail = mail_config($pdo);
               <button class="button" type="submit">Открыть билет</button>
             </form>
           </section>
-          <section class="admin-panel">
-            <div class="admin-list">
-              <?php if (!$tickets): ?><div class="admin-empty">Оформленных билетов пока нет.</div><?php endif; ?>
-              <?php foreach ($tickets as $ticket): ?>
-                <div class="admin-row">
-                  <div>
-                    <strong><?= h($ticket['code']) ?> · <?= h($ticket['buyer_name']) ?></strong>
-                    <span><?= h($ticket['title']) ?> · место <?= h($ticket['seat_number']) ?> · <?= h($ticket['buyer_email']) ?> · письмо <?= ((int) $ticket['email_sent'] === 1) ? 'ушло' : 'не ушло' ?> · <?= h($ticket['status']) ?></span>
-                  </div>
-                  <div class="admin-actions">
-                    <a class="mini-button" href="/?ticket=<?= urlencode((string) $ticket['code']) ?>">QR</a>
-                    <form method="post">
-                      <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
-                      <input type="hidden" name="action" value="ticket_status">
-                      <input type="hidden" name="id" value="<?= h($ticket['id']) ?>">
-                      <select name="status">
-                        <?php foreach (['confirmed' => 'Активен', 'checked_in' => 'Погашен', 'cancelled' => 'Отменен'] as $value => $label): ?>
-                          <option value="<?= h($value) ?>" <?= $ticket['status'] === $value ? 'selected' : '' ?>><?= h($label) ?></option>
-                        <?php endforeach; ?>
-                      </select>
-                      <button class="mini-button" type="submit">OK</button>
-                    </form>
-                  </div>
-                </div>
-              <?php endforeach; ?>
-            </div>
-          </section>
         <?php endif; ?>
 
         <?php if ($tab === 'staff' && can_manage_staff()): ?>

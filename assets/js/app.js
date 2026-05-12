@@ -158,13 +158,13 @@
       const ticket = payload.ticket;
       const days = Array.isArray(ticket.days) ? ticket.days.map((day) => day.event_date).join(', ') : '';
       const details = `${ticket.title}. Место ${ticket.seat_number}. ${ticket.venue}. ${days}`;
-      if (ticket.status === 'cancelled') {
-        setResult('denied', 'Проход запрещен', `Билет ${code} отменен. ${details}`, `/?ticket=${encodeURIComponent(code)}`);
-      } else if (ticket.status === 'checked_in') {
-        setResult('warning', 'Билет уже погашен', `${details}`, `/?ticket=${encodeURIComponent(code)}`);
-      } else {
-        setResult('allowed', 'Проход разрешен', `${details}`, `/?ticket=${encodeURIComponent(code)}`);
-      }
+      const allowed = ticket.status === 'confirmed';
+      setResult(
+        allowed ? 'allowed' : 'denied',
+        allowed ? 'Билет подтвержден' : 'Билет не подтвержден',
+        `${details}`,
+        `/?ticket=${encodeURIComponent(code)}`
+      );
     } catch {
       setResult('denied', 'Ошибка проверки', 'Не удалось обратиться к базе билетов.');
     }
