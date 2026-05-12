@@ -53,6 +53,11 @@
 
 * { box-sizing: border-box; }
 html { background: var(--bg); scroll-behavior: smooth; }
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
 body {
   margin: 0;
   min-height: 100vh;
@@ -1733,7 +1738,7 @@ select {
 .ticket-layout {
   grid-template-columns: minmax(0, 1fr) minmax(340px, 380px);
   gap: 22px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .ticket-card {
@@ -1773,6 +1778,10 @@ select {
 .status-panel {
   min-width: 0;
   overflow: hidden;
+  min-height: auto;
+  align-self: start;
+  justify-content: center;
+  padding: clamp(24px, 3vw, 34px);
 }
 
 .status-panel .button {
@@ -1780,6 +1789,22 @@ select {
   min-width: 0;
   white-space: normal;
   text-align: center;
+}
+
+.event-grid,
+.event-copy,
+.booking-panel {
+  min-width: 0;
+}
+
+.booking-panel {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.seat-map {
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .admin-header .site-nav {

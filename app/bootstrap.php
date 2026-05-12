@@ -379,8 +379,35 @@ function upload_gallery(string $field, array $existing = []): array {
 }
 
 function create_ticket(PDO $pdo, array $event, array $dayIds, int $seat, string $name, string $email, string $phone): array {
+  $dayIds = array_values(array_unique(array_map('intval', $dayIds)));
+  if (!$dayIds) {
+    throw new RuntimeException('Выберите хотя бы один день.');
+  }
+
   $pdo->beginTransaction();
   try {
+    $placeholders = implode(',', array_fill(0, count($dayIds), '?'));
+    $dayCheck = $pdo->prepare("SELECT COUNT(*) FROM event_days WHERE event_id = ? AND id IN ($placeholders)");
+    $dayCheck->execute(array_merge([(int) $event['id']], $dayIds));
+    if ((int) $dayCheck->fetchColumn() !== count($dayIds)) {
+      throw new RuntimeException('Выбранные дни не относятся к этому мероприятию.');
+    }
+
+    $busyCheck = $pdo->prepare("
+      SELECT 1
+      FROM ticket_days td
+      JOIN tickets t ON t.id = td.ticket_id
+      WHERE t.event_id = ?
+        AND t.status != 'cancelled'
+        AND td.seat_number = ?
+        AND td.event_day_id IN ($placeholders)
+      LIMIT 1
+    ");
+    $busyCheck->execute(array_merge([(int) $event['id'], $seat], $dayIds));
+    if ($busyCheck->fetchColumn()) {
+      throw new RuntimeException('Это место уже занято на один из выбранных дней.');
+    }
+
     $code = ticket_code();
     $paidAmount = 0;
     $stmt = $pdo->prepare('INSERT INTO tickets (code,event_id,seat_number,buyer_name,buyer_email,buyer_phone,paid_amount) VALUES (?,?,?,?,?,?,?)');
