@@ -99,13 +99,22 @@ function init_db(PDO $pdo): void {
       is_active INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS app_meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
   ");
   ensure_column($pdo, 'events', 'image', "TEXT NOT NULL DEFAULT ''");
   ensure_column($pdo, 'events', 'gallery', "TEXT NOT NULL DEFAULT '[]'");
 
   $count = (int) $pdo->query('SELECT COUNT(*) FROM events')->fetchColumn();
-  if ($count === 0) {
+  $seeded = meta_get($pdo, 'demo_seeded') === '1';
+  if (!$seeded && $count === 0) {
     seed_demo_events($pdo);
+    meta_set($pdo, 'demo_seeded', '1');
+  } elseif (!$seeded) {
+    meta_set($pdo, 'demo_seeded', '1');
   }
   seed_staff_users($pdo);
 }
@@ -118,6 +127,18 @@ function ensure_column(PDO $pdo, string $table, string $column, string $definiti
     }
   }
   $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $column . ' ' . $definition);
+}
+
+function meta_get(PDO $pdo, string $key): ?string {
+  $stmt = $pdo->prepare('SELECT value FROM app_meta WHERE key = ?');
+  $stmt->execute([$key]);
+  $value = $stmt->fetchColumn();
+  return $value === false ? null : (string) $value;
+}
+
+function meta_set(PDO $pdo, string $key, string $value): void {
+  $stmt = $pdo->prepare('INSERT INTO app_meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
+  $stmt->execute([$key, $value]);
 }
 
 function seed_staff_users(PDO $pdo): void {

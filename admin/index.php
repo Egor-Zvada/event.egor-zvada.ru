@@ -241,7 +241,7 @@ if (is_admin_role()) {
         <h1><?= is_admin_role() ? 'Управление' : 'Контроль' ?></h1>
       </div>
       <div class="admin-tabs">
-        <?php if (is_admin_role()): ?><a href="#events" class="is-active">Мероприятия</a><a href="#users">Сотрудники</a><?php endif; ?>
+        <?php if (is_admin_role()): ?><a href="/admin/#event-form" class="is-active">Создать мероприятие</a><a href="#events">Мероприятия</a><a href="#users">Сотрудники</a><?php endif; ?>
         <a href="#tickets">Билеты</a>
       </div>
     </div>
@@ -251,8 +251,14 @@ if (is_admin_role()) {
     <?php if (is_admin_role()): ?>
       <div class="admin-grid" id="events">
         <section class="admin-panel">
-          <h2>Мероприятия</h2>
+          <div class="admin-panel__head">
+            <h2>Мероприятия</h2>
+            <a class="mini-button" href="/admin/#event-form">Создать мероприятие</a>
+          </div>
           <div class="admin-list">
+            <?php if (!$events): ?>
+              <div class="admin-empty">Событий пока нет. Создайте первое мероприятие справа.</div>
+            <?php endif; ?>
             <?php foreach ($events as $event): ?>
               <?php $days = event_days($pdo, (int) $event['id']); ?>
               <div class="admin-row">
@@ -274,7 +280,7 @@ if (is_admin_role()) {
           </div>
         </section>
 
-        <section class="admin-panel">
+        <section class="admin-panel" id="event-form">
           <h2><?= $editEvent ? 'Редактировать событие' : 'Создать событие' ?></h2>
           <?php $editDays = $editEvent ? count(event_days($pdo, (int) $editEvent['id'])) : 1; ?>
           <form method="post" enctype="multipart/form-data">

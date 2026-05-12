@@ -6,8 +6,6 @@
   </a>
   <nav class="site-nav" aria-label="Разделы">
     <a href="/">Мероприятия</a>
-    <a href="/admin/">Админка</a>
-    <a href="/api.php?resource=events">API</a>
     <a href="https://egor-zvada.ru">Основной сайт</a>
   </nav>
 </header>

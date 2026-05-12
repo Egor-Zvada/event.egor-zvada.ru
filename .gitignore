@@ -4,3 +4,5 @@ assets/img/uploads/*
 !assets/img/uploads/.gitkeep
 config/admin.php
 config/mail.php
+config/php-local.ini
+run-local-server.ps1

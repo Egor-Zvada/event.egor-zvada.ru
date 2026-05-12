@@ -202,7 +202,7 @@ $pageDescription = 'Билеты на мероприятия, соревнова
       <div class="hero__copy">
         <p class="kicker">event module / tickets</p>
         <h1>Мероприятия</h1>
-        <p>Билеты, места, QR-проверка и админка для событий, которые должны выглядеть так, будто у них уже есть свой световой пульт.</p>
+        <p>Выберите мероприятие, забронируйте место и получите QR-билет сразу на экране.</p>
       </div>
       <div class="hero__panel">
         <span><?= count($events) ?></span>
@@ -210,14 +210,32 @@ $pageDescription = 'Билеты на мероприятия, соревнова
       </div>
     </section>
 
+    <section class="events-toolbar" aria-label="Поиск мероприятий">
+      <div>
+        <p class="kicker">event index</p>
+        <h2>Доступные мероприятия</h2>
+      </div>
+      <label class="search-field">
+        <span>Поиск</span>
+        <input type="search" placeholder="Название, место, организатор" data-event-search>
+      </label>
+    </section>
+
     <section class="event-list" aria-label="Список мероприятий">
-      <?php foreach ($events as $item): ?>
+      <?php if (!$events): ?>
+        <article class="empty-list">
+          <p class="kicker">empty</p>
+          <h2>Мероприятий пока нет</h2>
+          <p>Когда администратор опубликует событие, оно появится здесь.</p>
+        </article>
+      <?php endif; ?>
+      <?php foreach ($events as $index => $item): ?>
         <?php $days = event_days($pdo, (int) $item['id']); ?>
-        <article class="event-card">
+        <article class="event-card" data-event-card data-event-title="<?= h(mb_strtolower(($item['title'] ?? '') . ' ' . ($item['venue'] ?? '') . ' ' . ($item['organizer'] ?? ''), 'UTF-8')) ?>">
           <?php if (!empty($item['image'])): ?>
             <img class="event-card__image" src="<?= h($item['image']) ?>" alt="">
           <?php endif; ?>
-          <div class="event-card__index"><?= h(str_pad((string) $item['id'], 2, '0', STR_PAD_LEFT)) ?></div>
+          <div class="event-card__index"><?= h(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) ?></div>
           <div class="event-card__body">
             <p class="kicker"><?= h($item['organizer']) ?></p>
             <h2><?= h($item['title']) ?></h2>

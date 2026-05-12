@@ -34,3 +34,17 @@
   dayPicker?.addEventListener('change', syncBusySeats);
   syncBusySeats();
 })();
+
+(() => {
+  const search = document.querySelector('[data-event-search]');
+  const cards = [...document.querySelectorAll('[data-event-card]')];
+  if (!search || !cards.length) return;
+
+  search.addEventListener('input', () => {
+    const query = search.value.trim().toLowerCase();
+    cards.forEach((card) => {
+      const haystack = card.dataset.eventTitle || '';
+      card.hidden = query !== '' && !haystack.includes(query);
+    });
+  });
+})();
