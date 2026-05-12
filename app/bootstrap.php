@@ -128,7 +128,7 @@ function seed_staff_users(PDO $pdo): void {
   $adminUser = getenv('ADMIN_USER') ?: 'admin';
   $adminPassword = getenv('ADMIN_PASSWORD') ?: 'change-me-now';
   $controllerPassword = getenv('CONTROLLER_PASSWORD') ?: 'controller-change-me';
-  $stmt = $pdo->prepare('INSERT INTO staff_users (username,password_hash,role) VALUES (?,?,?)');
+  $stmt = $pdo->prepare('INSERT OR IGNORE INTO staff_users (username,password_hash,role) VALUES (?,?,?)');
   $stmt->execute([$adminUser, password_hash($adminPassword, PASSWORD_DEFAULT), 'admin']);
   $stmt->execute(['controller', password_hash($controllerPassword, PASSWORD_DEFAULT), 'controller']);
 }
