@@ -7,5 +7,9 @@
   <nav class="site-nav" aria-label="Разделы">
     <a href="/">Мероприятия</a>
     <a href="https://egor-zvada.ru">Основной сайт</a>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему">
+      <span class="theme-toggle__dot" aria-hidden="true"></span>
+      <span class="theme-toggle__text">theme</span>
+    </button>
   </nav>
 </header>

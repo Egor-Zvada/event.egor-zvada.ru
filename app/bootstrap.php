@@ -95,7 +95,7 @@ function init_db(PDO $pdo): void {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
-      role TEXT NOT NULL CHECK(role IN ('admin','controller')),
+      role TEXT NOT NULL CHECK(role IN ('owner','admin','controller')),
       is_active INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
@@ -107,6 +107,7 @@ function init_db(PDO $pdo): void {
   ");
   ensure_column($pdo, 'events', 'image', "TEXT NOT NULL DEFAULT ''");
   ensure_column($pdo, 'events', 'gallery', "TEXT NOT NULL DEFAULT '[]'");
+  migrate_staff_roles($pdo);
 
   $count = (int) $pdo->query('SELECT COUNT(*) FROM events')->fetchColumn();
   $seeded = meta_get($pdo, 'demo_seeded') === '1';
@@ -142,6 +143,33 @@ function meta_set(PDO $pdo, string $key, string $value): void {
   $stmt->execute([$key, $value]);
 }
 
+function migrate_staff_roles(PDO $pdo): void {
+  $createSql = (string) $pdo->query("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'staff_users'")->fetchColumn();
+  if (str_contains($createSql, "'owner'")) {
+    return;
+  }
+
+  $pdo->exec("
+    CREATE TABLE staff_users_next (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL CHECK(role IN ('owner','admin','controller')),
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  ");
+  $pdo->exec("
+    INSERT INTO staff_users_next (id, username, password_hash, role, is_active, created_at)
+    SELECT id, username, password_hash,
+      CASE WHEN role = 'admin' THEN 'owner' ELSE role END,
+      is_active, created_at
+    FROM staff_users
+  ");
+  $pdo->exec('DROP TABLE staff_users');
+  $pdo->exec('ALTER TABLE staff_users_next RENAME TO staff_users');
+}
+
 function seed_staff_users(PDO $pdo): void {
   $count = (int) $pdo->query('SELECT COUNT(*) FROM staff_users')->fetchColumn();
   if ($count > 0) {
@@ -151,7 +179,7 @@ function seed_staff_users(PDO $pdo): void {
   $adminPassword = getenv('ADMIN_PASSWORD') ?: 'change-me-now';
   $controllerPassword = getenv('CONTROLLER_PASSWORD') ?: 'controller-change-me';
   $stmt = $pdo->prepare('INSERT OR IGNORE INTO staff_users (username,password_hash,role) VALUES (?,?,?)');
-  $stmt->execute([$adminUser, password_hash($adminPassword, PASSWORD_DEFAULT), 'admin']);
+  $stmt->execute([$adminUser, password_hash($adminPassword, PASSWORD_DEFAULT), 'owner']);
   $stmt->execute(['controller', password_hash($controllerPassword, PASSWORD_DEFAULT), 'controller']);
 }
 
@@ -391,7 +419,22 @@ function ticket_by_code(PDO $pdo, string $code): ?array {
   return $ticket;
 }
 
-function mail_config(): array {
+function mail_config(?PDO $pdo = null): array {
+  if ($pdo instanceof PDO) {
+    $dbConfig = [
+      'host' => meta_get($pdo, 'smtp_host') ?? '',
+      'port' => (int) (meta_get($pdo, 'smtp_port') ?? 587),
+      'username' => meta_get($pdo, 'smtp_username') ?? '',
+      'password' => meta_get($pdo, 'smtp_password') ?? '',
+      'encryption' => meta_get($pdo, 'smtp_encryption') ?? 'tls',
+      'from_email' => meta_get($pdo, 'smtp_from_email') ?? '',
+      'from_name' => meta_get($pdo, 'smtp_from_name') ?? 'Egor Zvada Events',
+    ];
+    if (trim($dbConfig['host']) !== '') {
+      return $dbConfig;
+    }
+  }
+
   $file = dirname(__DIR__) . '/config/mail.php';
   if (is_file($file)) {
     $config = require $file;
@@ -520,7 +563,7 @@ function send_ticket_email(PDO $pdo, array $ticket): bool {
       </div>
     </body></html>";
 
-  $sent = smtp_send(mail_config(), $to, $subject, $body);
+  $sent = smtp_send(mail_config($pdo), $to, $subject, $body);
   if ($sent) {
     $pdo->prepare('UPDATE tickets SET email_sent = 1 WHERE id = ?')->execute([(int) $ticket['id']]);
   }

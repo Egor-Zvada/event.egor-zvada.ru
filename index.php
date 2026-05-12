@@ -86,7 +86,7 @@ $pageDescription = 'Билеты на мероприятия, соревнова
             <span class="status-dot"></span>
             <strong>Билет найден в базе</strong>
             <p>Статус билета: <?= h($ticket['status']) ?>. Покажите этот экран или QR-код на входе.</p>
-            <?php if (in_array($viewerRole, ['admin', 'controller'], true)): ?>
+            <?php if (in_array($viewerRole, ['owner', 'admin', 'controller'], true)): ?>
               <form method="post" action="/admin/">
                 <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
                 <input type="hidden" name="action" value="ticket_status">
