@@ -80,6 +80,7 @@ $pageDescription = 'Билеты на мероприятия и соревнов
               <p><?= h($ticket['venue']) ?></p>
             </div>
             <img class="ticket-qr" src="/qr.php?text=<?= urlencode($verifyUrl) ?>" alt="QR-код билета">
+            <div class="ticket-card__number">Билет № <?= h($ticket['code']) ?></div>
           </article>
           <aside class="status-panel">
             <span class="status-dot"></span>

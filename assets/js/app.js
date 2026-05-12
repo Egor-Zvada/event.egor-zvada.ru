@@ -78,6 +78,29 @@
 })();
 
 (() => {
+  const consent = document.querySelector('[data-privacy-consent]');
+  const accept = document.querySelector('[data-privacy-accept]');
+  const storageKey = 'event-privacy-consent-v1';
+  if (!consent || !accept) return;
+
+  let accepted = false;
+  try {
+    accepted = localStorage.getItem(storageKey) === '1';
+  } catch {}
+
+  if (!accepted) {
+    consent.hidden = false;
+  }
+
+  accept.addEventListener('click', () => {
+    try {
+      localStorage.setItem(storageKey, '1');
+    } catch {}
+    consent.hidden = true;
+  });
+})();
+
+(() => {
   const scanner = document.querySelector('[data-qr-scanner]');
   if (!scanner) return;
 
