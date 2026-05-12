@@ -860,9 +860,17 @@ main {
   font-weight: 800;
 }
 
+.admin-login h1 {
+  font-size: clamp(56px, 9vw, 96px);
+}
+
 .hero__panel,
 .event-card,
 .card,
+.booking-panel,
+.events-toolbar,
+.empty-list,
+.notice,
 .ticket-card,
 .status-panel,
 .admin-sidebar,
